@@ -1,0 +1,24 @@
+npm init -y
+npm install express
+npm install bcryptjs validator jsonwebtoken cookie-parser dotenv
+npm i -D nodemon    //dev dependency to keep on update it.
+npm i -D prisma   //it is dev Dependencies
+npx prisma init
+npm install @prisma/client
+npx prisma generate
+npm install bcrypt
+
+we changed this:
+from:
+    "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+     },
+
+to:
+   "scripts": {
+    "dev": "nodemon index.js"
+     },
+
+
+to run:
+   ==>     npm run dev
