@@ -25,32 +25,34 @@ exports.signup = async (req, res, next) => {
 
 
 
-exports.login = async (req, res, next) => {
+exports.login =async (req, res,next) => {
     try {
         const { email, password } = req.body;
-        if (!email || !password) {
-            throw new Error("Please enter both credentials");
-        }
-
         const user = await prisma.user.findUnique({
             where: {
-                email
+                email: email
             }
         });
 
-        // If no user found
         if (!user) {
-            throw new Error("User not found");
+            res.status(401).json({ success: false, error: 'Invalid User' });
+            return;
         }
+        const match = await bcrypt.compare(password, user.password);
+          if (!match) {
+             res.status(401).json({ success: false, error: 'Invalid credentials' });
+             return;
+            }
 
-        // If password mismatch
-        if (user.password !== password) {
-            throw new Error("Invalid password");
-        }
-        cookieToken(user, res);
-        res.status(200).json({ message: "Login successful" });
+        req.session.user = {
+            id: user.id,
+            email: user.email,
+        };
+
+        res.status(200).json({ success: true, user: req.session.user });
     } catch (error) {
-        throw error; 
+        console.error('Error occurred during login:', error);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 };
 
