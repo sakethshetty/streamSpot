@@ -1,0 +1,31 @@
+# Node.js
+node_modules/
+
+# Build output
+.next/
+out/
+
+# Dependency lock files
+package-lock.json
+pnpm-lock.yaml
+
+# Testing frameworks
+jest/
+
+# Editor configuration
+.vscode/
+
+# IDE temporary/cache files
+.idea/
+
+# Local environmental variables
+.env
+
+# Logs
+logs/
+
+# End-to-end test reports
+cypress/reports/
+
+# Coverage reports
+coverage/

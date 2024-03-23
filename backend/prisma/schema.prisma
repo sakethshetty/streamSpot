@@ -19,4 +19,14 @@ model User {
   name     String?
   email    String  @unique
   password String
+  
+}
+
+model Video{
+  id String @id @default(uuid()) @map("_id") @db.ObjectId
+  title String
+  description String
+  views Int
+  oid String @unique
+  createdAt DateTime
 }
