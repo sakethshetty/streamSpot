@@ -30,11 +30,10 @@ export default function NavbarComponent() {
       </div>
       <Navbar.Collapse>
         <Navbar.Link href="#" active>
-          Home
+        
         </Navbar.Link>
         <Navbar.Link href="#">Home</Navbar.Link>
-        <Navbar.Link href="#">Pricing</Navbar.Link>
-        <Navbar.Link href="#">Contact</Navbar.Link>
+        <Navbar.Link href="#">Create</Navbar.Link>
       </Navbar.Collapse>
     </Navbar>
   );
