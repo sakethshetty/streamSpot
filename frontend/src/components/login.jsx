@@ -54,7 +54,7 @@ export function LoginForm() {
         <div className="mb-2 block">
           <Label htmlFor="email1" value="Your email" />
         </div>
-        <TextInput id="email1" type="email" placeholder="gmail.com" required />
+        <TextInput id="email1" type="email" placeholder="example@example.com" required />
       </div>
       <div>
         <div className="mb-2 block">
