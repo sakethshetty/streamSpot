@@ -39,7 +39,7 @@ model Video {
   id            String      @id @default(auto()) @map("_id") @db.ObjectId
   title         String
   description   String?
-  url           String      // ig..we will store video URLs
+  url           String      //we will store video URLs
   thumbnail     String?     // it is for thumbnail URL
   likes         Int         @default(0)
   dislikes      Int         @default(0)
@@ -53,6 +53,7 @@ model Post {
   id            String      @id @default(auto()) @map("_id") @db.ObjectId
   title         String
   content       String
+  imageUrl      String
   likes         Int         @default(0)
   dislikes      Int         @default(0)
   comments      Comment[]   // (it is 1:n) relationship with comments
