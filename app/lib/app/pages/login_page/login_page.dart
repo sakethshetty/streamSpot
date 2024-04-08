@@ -12,18 +12,18 @@ class LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   String _email = '';
   String _password = '';
-  String _name = '';
 
   void _submit() async {
+    print(_email);
+    print(_password);
     if (_formKey.currentState?.validate() ?? false) {
       _formKey.currentState?.save();
       var response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/signup'),
+        Uri.parse('http://10.0.2.2:5000/api/login'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode(<String, String>{
-          'name': _name,
           'email': _email,
           'password': _password,
         }),
@@ -73,22 +73,6 @@ class LoginPageState extends State<LoginPage> {
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
                 decoration: const InputDecoration(
-                  labelText: 'Name',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value?.isEmpty ?? false) {
-                    return 'Please enter your Name';
-                  }
-                  return null;
-                },
-                onSaved: (value) => _name = value!,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                decoration: const InputDecoration(
                   labelText: 'Password',
                   border: OutlineInputBorder(),
                 ),
@@ -109,6 +93,22 @@ class LoginPageState extends State<LoginPage> {
                 child: const Text('Login'),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Text('Don\'t have an account? '),
+                  TextButton(
+                    onPressed: () {
+                      // Navigate to the login page
+                      Navigator.of(context).pushNamed('/signup');
+                    },
+                    child: const Text('SignUp'),
+                  ),
+                ],
+              ),
+            )
           ],
         ),
       ),

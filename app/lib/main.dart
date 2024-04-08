@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-// import 'app/pages/signup_page/signup_page.dart';
+import 'app/pages/homePage/home_page.dart';
 import 'app/pages/login_page/login_page.dart';
-// import 'app/pages/home_page/home_page.dart';
-// import 'app/pages/userdetail_page/userdetail_page.dart';
+import 'app/pages/userDetailsPage/user_detail_page.dart';
+import 'app/pages/signupPage/signup_page.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -20,12 +20,12 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      initialRoute: '/',
+      initialRoute: '/login',
       routes: {
-        '/': (context) => const LoginPage(),
-        // '/signup': (context) => SignupPage(),
-        // '/home': (context) => HomePage(),
-        // '/userdetail': (context) => UserDetailPage(),
+        '/': (context) => const HomePage(),
+        '/signup': (context) => const SignUpPage(),
+        '/login': (context) => const LoginPage(),
+        '/userdetail': (context) => const AccountDetailsPage(),
       }
     );
   }
