@@ -7,25 +7,30 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // Import Prisma instance configured for MongoDB
-const prisma = require('./prisma'); 
+const prisma = require('./prisma');
 
 const app = express();
 
 app.use(cookieParser());
 
 const store = new MongoDBStore({
-    uri: process.env.DATABASE_URL,
-    collection: 'sessions'
+  uri: process.env.DATABASE_URL,
+  collection: 'sessions'
 });
 
 app.use(session({
-    secret: 'your-secret-key',
-    resave: false,
-    saveUninitialized: true,
-    store: store,
+  secret: 'your-strong-secret-key', // Replace with a long, random string
+  resave: false,
+  saveUninitialized: true,
+  store: store
 }));
 
-app.use(cors());
+// Configure CORS to allow requests from your React app's origin
+app.use(cors({
+  origin: 'http://localhost:3000', // Replace with your React app's origin
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -33,8 +38,7 @@ app.use(express.urlencoded({ extended: false }));
 const userRouter = require('./routes/userRouter');
 app.use('/api', userRouter);
 
-
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
