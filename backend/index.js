@@ -19,15 +19,15 @@ const store = new MongoDBStore({
 });
 
 app.use(session({
-  secret: 'your-strong-secret-key', // Replace with a long, random string
+  secret: 'your-strong-secret-key', 
   resave: false,
   saveUninitialized: true,
   store: store
 }));
 
-// Configure CORS to allow requests from your React app's origin
+// it is a configure CORS to allow requests from your React app's origin
 app.use(cors({
-  origin: 'http://localhost:3000', // Replace with your React app's origin
+  origin: 'http://localhost:3000', 
   credentials: true
 }));
 
