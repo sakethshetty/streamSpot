@@ -21,26 +21,6 @@ const drive = google.drive({
     auth: oauth2Client,
 });
 
-//it is function to upload file to Google Drive here used the Gdrive API to store the Posts
-async function uploadFile(filePath) {
-    try {
-        const response = await drive.files.create({
-            requestBody: {
-                name: path.basename(filePath),
-                mimeType: 'image/jpg'
-            },
-            media: {
-                mimeType: 'image/jpg',
-                body: fs.createReadStream(filePath),
-            },
-        });
-        return response.data;
-    } catch (error) {
-        console.log(error.message);
-        throw new Error("Failed to upload file to Google Drive");
-    }
-}
-
 // it is function to generate sharable link where by using this link,we stored this sharable link into the MONGO DB databse 
 async function generatePublicUrl(fileId) {
     try {
@@ -62,6 +42,7 @@ async function generatePublicUrl(fileId) {
     }
 }
 
+//it is function to Create and upload Post to Google Drive by using the Gdrive API to store the Posts
 exports.createPost = async (req, res, next) => {
     try {
         const { title, content, authorId, filePath } = req.body;

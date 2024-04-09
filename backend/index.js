@@ -36,7 +36,13 @@ app.use(express.urlencoded({ extended: false }));
 
 // Import and use routes
 const userRouter = require('./routes/userRouter');
+const postRouter = require('./routes/postRouter');
+const videoRouter = require('./routes/videoRouter');
+
+
 app.use('/api', userRouter);
+app.use('/api', postRouter);
+app.use('/api', videoRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
