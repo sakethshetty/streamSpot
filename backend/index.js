@@ -44,6 +44,17 @@ app.use('/api', userRouter);
 app.use('/api', postRouter);
 app.use('/api', videoRouter);
 
+//Error handling Middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500).json({
+    error: {
+      message: err.message || 'Internal Server Error'
+    }
+  });
+});
+
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
