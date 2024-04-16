@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { uploadVideo, deleteVideo, getAllvideos } = require('../controllers/videoController');
+const { uploadVideo, deleteVideo, getAllVideos } = require('../controllers/videoController');
 const isLogedIN = require('../middleware/isLoggedIn');
 
-router.route('/post/uploadVideo').post(isLogedIN, uploadVideo);
-router.route('/post/deleteVideo/:id').delete(isLogedIN, deleteVideo);
-router.route('/post/getAllvideos').get(getAllvideos);
+router.route('/video/uploadVideo').post(uploadVideo);
+router.route('/video/deleteVideo/:id').delete(isLogedIN,deleteVideo);
+router.route('/video/getAllVideos').get(getAllVideos);
 
-module.exports = router;
+module.exports = router

@@ -19,7 +19,7 @@ exports.signup = async (req, res, next) => {
         cookieToken(user, res);
         res.status(200).json({ message: 'User signed up successfully!' });
     } catch (error) {
-        next(error);
+        throw new Error(error)
     }
 };
 
