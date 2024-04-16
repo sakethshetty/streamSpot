@@ -9,11 +9,10 @@ export default function NavbarComponent() {
         <img src="/favicon.ico" className="mr-3 h-6 sm:h-9" alt="Flowbite React Logo" />
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white mr-10">Streamspot</span>
       </Navbar.Brand>
-      <div className="flex md:order-2">
-      <Dropdown label="Home" inline>
-      <Dropdown.Item>Trending</Dropdown.Item>
-      <Dropdown.Item>Subscribed</Dropdown.Item>
-    </Dropdown>
+      <div className="flex md:order-1">
+     
+         
+       
       <Dropdown label="Create" inline>
       <Dropdown.Item>Upload</Dropdown.Item>
       <Dropdown.Item>live steam</Dropdown.Item>
@@ -37,7 +36,13 @@ export default function NavbarComponent() {
       
         <Navbar.Toggle />
       </div>
-    
+      <Navbar.Collapse>
+        <Navbar.Link href="#" active>
+          Home
+        </Navbar.Link>
+        <Navbar.Link href="#">Trending</Navbar.Link>
+        <Navbar.Link href="#">Subscribed   </Navbar.Link>
+        </Navbar.Collapse>
     </Navbar>
   );
 }
