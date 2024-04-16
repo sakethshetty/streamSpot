@@ -99,11 +99,20 @@ exports.deletePost = async (req, res, next) => {
     }
 }
 
-exports.getPosts = async (req, res, next) => {
+exports.getAllPostsWithComments = async (req, res, next) => {
     try {
-        const result = await prisma.post.findMany();
-        res.json(result);
+        // Fetch all videos along with their related comments
+        const postsWithComments = await prisma.post.findMany({
+            include: {
+                postcomments: {
+                    include: {
+                        user: true,
+                    }
+                },
+            },
+        });
+        res.json(postsWithComments);
     } catch (error) {
         next(error);
     }
-}
+};

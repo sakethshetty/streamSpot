@@ -103,12 +103,20 @@ exports.deleteVideo = async (req, res, next) => {
 };
 
 // it is a function to get all videos
-exports.getAllVideos = async (req, res, next) => {
-    //console.log("<AIN***");
+exports.getAllVideosWithComments = async (req, res, next) => {
     try {
-        const result = await prisma.video.findMany();
-        res.json(result);
+        // Fetch all videos along with their related comments
+        const videosWithComments = await prisma.video.findMany({
+            include: {
+                videocomments: {
+                    include: {
+                        user: true,
+                    }
+                },
+            },
+        });
+        res.json(videosWithComments);
     } catch (error) {
         next(error);
     }
-}
+};

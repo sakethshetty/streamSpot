@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { createPost, updatePost, deletePost, getPosts } = require('../controllers/postsController')
+const { createPost, updatePost, deletePost, getAllPostsWithComments } = require('../controllers/postsController')
 
 const isLoggedIn = require('../middleware/isLoggedIn')
 
@@ -14,7 +14,7 @@ const isLoggedIn = require('../middleware/isLoggedIn')
 router.route('/post/createPost').post(isLoggedIn, createPost);
 router.route('/post/updatePost/:id').put(isLoggedIn, updatePost);
 router.route('/post/deletePost/:id').delete(isLoggedIn, deletePost);
-router.route('/post/getPosts').get(getPosts);
+router.route('/post/getAllPostsWithComments').get(getAllPostsWithComments);
 
 
 module.exports=router
