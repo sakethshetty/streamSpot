@@ -33,6 +33,7 @@ class SignUpPageState extends State<SignUpPage> {
       if (response.statusCode == 200) {
         // If the server did return a 200 OK response,
         // then parse the JSON.
+        Navigator.of(context).pushReplacementNamed('/login');
         print('User signed up successfully!');
       } else {
         // If the server did not return a 200 OK response,
@@ -119,7 +120,7 @@ class SignUpPageState extends State<SignUpPage> {
                     TextButton(
                       onPressed: () {
                         // Navigate to the login page
-                        Navigator.of(context).pushNamed('/login');
+                        Navigator.of(context).pushReplacementNamed('/login');
                       },
                       child: const Text('Login'),
                     ),
