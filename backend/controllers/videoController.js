@@ -27,54 +27,64 @@ const drive = google.drive({
 
 // Function to upload file to Google Drive
 exports.uploadVideo = async (req, res, next) => {
-    const { filePath, title, description, channelId } = req.body;
-
-    console.log("Uploading file from path:", filePath);
-
+    const { videoFilePath, thumbnailFilePath, title, description,} = req.body;
+    //now here neglectd the channelId ... later we have to take as input parameter
     try {
-        // Check if file exists
-        if (!fs.existsSync(filePath)) {
-            console.log("File not found at the specified file path:", filePath);
-            return res.status(404).json({ error: 'File not found at the specified file path' });
+        // Check if files exist
+        if (!fs.existsSync(videoFilePath) || !fs.existsSync(thumbnailFilePath)) {
+            return res.status(404).json({ error: 'One or more files not found at the specified file paths' });
         }
 
-        // Create read stream for file
-        const fileStream = fs.createReadStream(filePath);
+        // Create read streams for video and thumbnail files
+        const videoFileStream = fs.createReadStream(videoFilePath);
+        const thumbnailFileStream = fs.createReadStream(thumbnailFilePath);
 
-        console.log("File stream created");
-
-        // Upload file to Google Drive
-        const response = await drive.files.create({
+        // it is for uploading video file to Google Drive
+        const videoResponse = await drive.files.create({
             requestBody: {
-                name: path.basename(filePath),
+                name: path.basename(videoFilePath),
                 mimeType: 'video/mp4',
             },
             media: {
                 mimeType: 'video/mp4',
-                body: fileStream,
+                body: videoFileStream,
             },
         });
+        console.log("video uploaded to Google Drive");
+        //it is for Uploading thumbnail image to Google Drive
+        const thumbnailResponse = await drive.files.create({
+            requestBody: {
+                name: path.basename(thumbnailFilePath),
+                mimeType: 'image/jpeg', // Adjust MIME type if needed
+            },
+            media: {
+                mimeType: 'image/jpeg',
+                body: thumbnailFileStream,
+            },
+        });
+        
+        console.log("photo uploaded to Google Drive");
+        
 
-        console.log("File uploaded to Google Drive");
+        // Generate sharable links for the uploaded video and thumbnail
+        const videoFileId = videoResponse.data.id;
+        const thumbnailFileId = thumbnailResponse.data.id;
+        const videoPublicUrl = await generatePublicUrl(videoFileId);
+        const thumbnailPublicUrl = await generatePublicUrl(thumbnailFileId);    
 
-        // Generate sharable link for the uploaded video
-        const fileId = response.data.id;
-        const publicUrl = await generatePublicUrl(fileId);
-        const { webViewLink, webContentLink } = publicUrl;
-
-        console.log("Sharable link generated:", webViewLink);
-
+        console.log("video Sharable link generated:", videoPublicUrl);
+        console.log("tumbnail Sharable link generated:", thumbnailPublicUrl);
+        
         // Store video details in MongoDB
         const video = await prisma.video.create({
             data: {
                 title,
                 description,
-                url: webViewLink,
-                channelId,
+                url: videoPublicUrl.webViewLink,
+                thumbnail: thumbnailPublicUrl.webViewLink,
+                //channelId,
             }
         });
-
-        console.log("Video details stored in MongoDB");
 
         // Send response with created video data
         res.json(video);
@@ -84,6 +94,7 @@ exports.uploadVideo = async (req, res, next) => {
         next(error);
     }
 };
+
 // Function to generate sharable link for the uploaded video
 async function generatePublicUrl(fileId) {
     try {
@@ -110,6 +121,9 @@ async function generatePublicUrl(fileId) {
         throw new Error("Failed to generate sharable link");
     }
 }
+
+
+
 
 //it is a function to delete a video
 exports.deleteVideo = async (req, res, next) => {

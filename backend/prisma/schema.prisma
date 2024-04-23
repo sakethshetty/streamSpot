@@ -33,7 +33,7 @@ model Channel {
   description   String?
   creator       User        @relation(fields: [creatorId], references: [id])
   creatorId     String      @map("_creatorId") @db.ObjectId // it is FK to User model
-  videos        Video[]     // one channel may have many videos so(1-many) 
+ // videos        Video[]     // one channel may have many videos so(1-many) 
   // subscribers User[]    @relation("Subscriptions", references: [id]) // (it is like m:n)relationship with users subscribing to channels
 }
 
@@ -43,12 +43,12 @@ model Video {
   title         String
   description   String?
   url           String      //we will store video URLs
-  //thumbnail     String?     // it is for thumbnail URL
+  thumbnail     String?     // it is for thumbnail URL
   likes         Int         @default(0)
   dislikes      Int         @default(0)
   videocomments     VideoComment[]   // (it is 1:n ) relationship with comments models. 
-  channel       Channel     @relation(fields: [channelId], references: [id])
-  channelId     String      @map("_channelId") @db.ObjectId // FK to Channel model
+  // channel       Channel     @relation(fields: [channelId], references: [id])
+  // channelId     String      @map("_channelId") @db.ObjectId // FK to Channel model
 }
 
 // it is post model to store user posts
