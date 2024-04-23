@@ -3,10 +3,10 @@ const { google } = require('googleapis');
 const path = require('path');
 const fs = require('fs');
 
-const CLIENT_ID = '796518376376-h1akdhreatbcrh9kiglvm2veoggit2pf.apps.googleusercontent.com';
-const CLIENT_SECRET = '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';
+const CLIENT_ID = '796518376376-e24tlbe3i51pgviolmk7o7btaef9esh7.apps.googleusercontent.com';
+const CLIENT_SECRET = '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';
 const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
-const REFRESH_TOKEN = '1//04ddaRyUdGrpyCgYIARAAGAQSNwF-L9IrJH6p2ni9PsuUDtNy-JAaCv0-8qPqFtnarXq_FUOpKmFvNoLu0tSxl9uDn5AJOQ-w7VY';
+const REFRESH_TOKEN = '1//04Tew6QKZPoU3CgYIARAAGAQSNwF-L9IrDrQBqHpzjbef2TrBzRJnRv3ShC8P2fBpGj2daeP5rEnL6Da_4LYYhG2y59AXBtNp3iM';
 
 const oauth2Client = new google.auth.OAuth2(
     CLIENT_ID,

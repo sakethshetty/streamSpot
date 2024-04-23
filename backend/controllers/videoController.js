@@ -4,10 +4,11 @@ const path = require('path');
 const fs = require('fs');
 
 // it's all Google Drive API credentials
-const CLIENT_ID = '796518376376-h1akdhreatbcrh9kiglvm2veoggit2pf.apps.googleusercontent.com'
-const CLIENT_SECRET = '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'
-const REDIRECT_URI = 'https://developers.google.com/oauthplayground'
-const REFRESH_TOKEN = '1//04ddaRyUdGrpyCgYIARAAGAQSNwF-L9IrJH6p2ni9PsuUDtNy-JAaCv0-8qPqFtnarXq_FUOpKmFvNoLu0tSxl9uDn5AJOQ-w7VY'
+const CLIENT_ID = '796518376376-e24tlbe3i51pgviolmk7o7btaef9esh7.apps.googleusercontent.com';
+const CLIENT_SECRET = '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';
+const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
+const REFRESH_TOKEN = '1//04Tew6QKZPoU3CgYIARAAGAQSNwF-L9IrDrQBqHpzjbef2TrBzRJnRv3ShC8P2fBpGj2daeP5rEnL6Da_4LYYhG2y59AXBtNp3iM';
+
 
 const oauth2Client = new google.auth.OAuth2(
     CLIENT_ID,
@@ -24,18 +25,29 @@ const drive = google.drive({
     auth: oauth2Client,
 });
 
-//it is Function to upload file to Google Drive
+// Function to upload file to Google Drive
 exports.uploadVideo = async (req, res, next) => {
     const { filePath, title, description, channelId } = req.body;
 
     console.log("Uploading file from path:", filePath);
 
     try {
+        // Check if file exists
+        if (!fs.existsSync(filePath)) {
+            console.log("File not found at the specified file path:", filePath);
+            return res.status(404).json({ error: 'File not found at the specified file path' });
+        }
+
+        // Create read stream for file
         const fileStream = fs.createReadStream(filePath);
+
+        console.log("File stream created");
+
+        // Upload file to Google Drive
         const response = await drive.files.create({
             requestBody: {
                 name: path.basename(filePath),
-                mimeType: 'video/mp4' 
+                mimeType: 'video/mp4',
             },
             media: {
                 mimeType: 'video/mp4',
@@ -43,10 +55,16 @@ exports.uploadVideo = async (req, res, next) => {
             },
         });
 
+        console.log("File uploaded to Google Drive");
+
+        // Generate sharable link for the uploaded video
         const fileId = response.data.id;
         const publicUrl = await generatePublicUrl(fileId);
         const { webViewLink, webContentLink } = publicUrl;
 
+        console.log("Sharable link generated:", webViewLink);
+
+        // Store video details in MongoDB
         const video = await prisma.video.create({
             data: {
                 title,
@@ -55,20 +73,21 @@ exports.uploadVideo = async (req, res, next) => {
                 channelId,
             }
         });
+
+        console.log("Video details stored in MongoDB");
+
+        // Send response with created video data
         res.json(video);
     } catch (error) {
-        if (error.code === 'ENOENT') {
-            res.status(404).json({ error: 'File not found at the specified file path' });
-        } else {
-            next(error);
-        }
+        // Handle errors
+        console.error("Error during video upload:", error);
+        next(error);
     }
 };
-
-
-// it is a Function to generate sharable link for the video uploaded video into Gdrive which helps to store the link into MONGO DB database
+// Function to generate sharable link for the uploaded video
 async function generatePublicUrl(fileId) {
     try {
+        // Set permissions for the file
         await drive.permissions.create({
             fileId: fileId,
             requestBody: {
@@ -76,13 +95,18 @@ async function generatePublicUrl(fileId) {
                 type: 'anyone',
             },
         });
+
+        // Get sharable link for the file
         const result = await drive.files.get({
             fileId: fileId,
             fields: 'webViewLink, webContentLink',
         });
+
+        // Return the link data
         return result.data;
     } catch (error) {
-        console.log(error.message);
+        // Handle errors
+        console.error(error.message);
         throw new Error("Failed to generate sharable link");
     }
 }
