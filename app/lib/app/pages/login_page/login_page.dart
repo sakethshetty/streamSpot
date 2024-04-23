@@ -14,8 +14,6 @@ class LoginPageState extends State<LoginPage> {
   String _password = '';
 
   void _submit() async {
-    print(_email);
-    print(_password);
     if (_formKey.currentState?.validate() ?? false) {
       _formKey.currentState?.save();
       var response = await http.post(
@@ -29,11 +27,11 @@ class LoginPageState extends State<LoginPage> {
         }),
       );
 
-      print(response);
       if (response.statusCode == 200) {
         // If the server did return a 200 OK response,
         // then parse the JSON.
-        print('User signed up successfully!');
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop();
       } else {
         // If the server did not return a 200 OK response,
         // then throw an exception.
@@ -102,7 +100,7 @@ class LoginPageState extends State<LoginPage> {
                   TextButton(
                     onPressed: () {
                       // Navigate to the login page
-                      Navigator.of(context).pushNamed('/signup');
+                      Navigator.of(context).pushReplacementNamed('/signup');
                     },
                     child: const Text('SignUp'),
                   ),
