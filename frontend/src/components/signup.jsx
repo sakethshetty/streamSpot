@@ -68,9 +68,11 @@ export function SignupForm() {
       </div>
       <Button type="submit">Submit</Button>
       <h3 className="text-s text-center p-1">already have an account??</h3>
+      <a href="/page1">
       <Button outline gradientDuoTone="purpleToBlue">
-        Login
+          Login
       </Button>
+      </a>
     </form>
   );
 }
