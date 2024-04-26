@@ -49,7 +49,7 @@ exports.login =async (req, res,next) => {
             id: user.id,
             email: user.email,
         };
-
+        cookieToken(user, res);
         res.status(200).json({ success: true, user: req.session.user });
     } catch (error) {
         console.error('Error occurred during login:', error);
