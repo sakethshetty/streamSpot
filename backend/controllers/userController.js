@@ -1,3 +1,5 @@
+// bring in prisma and cookies
+
 const bcrypt = require('bcrypt');
 const prisma = require('../prisma/index');
 const cookieToken = require('../utils/cookieToken');
@@ -16,44 +18,49 @@ exports.signup = async (req, res, next) => {
                 password,
             }
         });
+
+        // Set the cookie token
         cookieToken(user, res);
-        res.status(200).json({ message: 'User signed up successfully!' });
+
+        // Send a success response if everything went well
+        //res.status(200).json({ message: 'User signed up successfully!' });
     } catch (error) {
-        throw new Error(error)
+        // Handle errors properly
+        next(error);
     }
 };
 
 
 
-exports.login =async (req, res,next) => {
+exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-        console.log(email, password);
+        if (!email || !password) {
+            throw new Error("Please enter both credentials");
+        }
+
         const user = await prisma.user.findUnique({
             where: {
-                email: email
+                email
             }
         });
 
+        // If no user found
         if (!user) {
-            res.status(401).json({ success: false, error: 'Invalid User' });
-            return;
+            throw new Error("User not found");
         }
-        const match = await bcrypt.compare(password, user.password);
-          if (!match) {
-             res.status(401).json({ success: false, error: 'Invalid credentials' });
-             return;
-            }
 
-        req.session.user = {
-            id: user.id,
-            email: user.email,
-        };
+        // If password mismatch
+        if (user.password !== password) {
+            throw new Error("Invalid password");
+        }
         cookieToken(user, res);
-        res.status(200).json({ success: true, user: req.session.user });
+        // If login successful, send success response
+        //res.status(200).json({ message: "Login successful" });
     } catch (error) {
-        console.error('Error occurred during login:', error);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        // Pass the error to the error handling middleware
+        // next(error);
+        throw error; 
     }
 };
 
@@ -63,7 +70,9 @@ exports.login =async (req, res,next) => {
 exports.logout = async (req, res, next) => {
     try {
         res.clearCookie('token');
-        res.status
+        res.json({
+            success:true
+        })
     } catch (error) {
         throw new Error("Error in user Logged out");
     }
