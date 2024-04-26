@@ -32,7 +32,9 @@ export default function NavbarComponent() {
           <Dropdown.Item>Profile</Dropdown.Item>
           </a>
           <Dropdown.Divider />
+          <a href="/page0">
           <Dropdown.Item>Sign out</Dropdown.Item>
+          </a>
         </Dropdown>
         
       
