@@ -28,16 +28,20 @@ export default function NavbarComponent() {
             <span className="block text-sm">User</span>
             <span className="block truncate text-sm font-medium">example@example.com</span>
           </Dropdown.Header>
+          <a href="/Account">
           <Dropdown.Item>Profile</Dropdown.Item>
+          </a>
           <Dropdown.Divider />
+          <a href="/page0">
           <Dropdown.Item>Sign out</Dropdown.Item>
+          </a>
         </Dropdown>
         
       
         <Navbar.Toggle />
       </div>
       <Navbar.Collapse>
-        <Navbar.Link href="#" active>
+        <Navbar.Link href="#" >
           Home
         </Navbar.Link>
         <Navbar.Link href="#">Trending</Navbar.Link>
