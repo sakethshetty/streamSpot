@@ -1,33 +1,61 @@
+import 'dart:convert';
+
+import 'package:app/app/pages/signupPage/signup_page.dart';
 import 'package:flutter/material.dart';
 import 'app/pages/homePage/home_page.dart';
 import 'app/pages/login_page/login_page.dart';
-import 'app/pages/userDetailsPage/user_detail_page.dart';
-import 'app/pages/signupPage/signup_page.dart';
+
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  Future<String> get jwtOrEmpty async {
+    var jwt = await storage.read(key: "jwt");
+    if (jwt == null) return "";
+    return jwt;
+  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      initialRoute: '/login',
-      routes: {
-        '/': (context) => const HomePage(),
-        '/signup': (context) => const SignUpPage(),
-        '/login': (context) => const LoginPage(),
-        '/userdetail': (context) => const AccountDetailsPage(),
-      }
-    );
+        title: 'Flutter Demo',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: FutureBuilder(
+            future: jwtOrEmpty,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) return const CircularProgressIndicator();
+              if (snapshot.data != "") {
+                var str = snapshot.data;
+                var jwt = str?.split(".");
+
+                if (jwt?.length != 3) {
+                  return const LoginPage();
+                } else {
+                  var payload = json.decode(
+                      ascii.decode(base64.decode(base64.normalize(jwt![1]))));
+                  if (DateTime.fromMillisecondsSinceEpoch(payload["exp"] * 1000)
+                      .isAfter(DateTime.now())) {
+                    return HomePage(str!, payload);
+                  } else {
+                    return const LoginPage();
+                  }
+                }
+              } else {
+                return const LoginPage();
+              }
+            }),
+        routes: {
+          '/login': (context) => const LoginPage(),
+          '/signup': (context) => const SignUpPage(),
+          // Add more routes as needed
+        });
   }
 }
 

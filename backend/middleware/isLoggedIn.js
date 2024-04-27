@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 const isLoggedIn = async (req, res, next) => {
     try {
         const token = req.cookies.token
-        
+        console.log(token);
         if (!token) {
             res.send('please login');
             throw new Error('You are not Logged in')
