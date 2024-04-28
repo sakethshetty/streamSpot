@@ -48,8 +48,8 @@ class HomePageState extends State<HomePage> {
 
   // List of pages for navigation
   final List<Widget> _pages = [
-    const VideoListPage(), // VideoListPage is now one of the pages
-    const AccountDetailsPage()
+    const VideoListPage(),
+    const AccountDetailsPage(),// VideoListPage is now one of the pages
     // Add other pages here
   ];
 
