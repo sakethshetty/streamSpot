@@ -1,6 +1,6 @@
 import { LoginForm } from "@/components/login";
 import NavbarComponent from "@/components/navbar";
-import VideoList from "@/components/videos";
+
 import { Account } from "@/components/account";
 import Image from "next/image";
 import { SignupForm } from "@/components/signup";

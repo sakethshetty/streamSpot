@@ -1,3 +1,4 @@
+import 'package:app/app/pages/login_page/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 // Drawer Widget
@@ -20,17 +21,9 @@ class CustomDrawerState extends State<CustomDrawer> {
 
   Future<bool> checkLoggedIn() async {
     
-    var response = await http.get(
-        Uri.parse('http://10.0.2.2:5000/api/isloggedin'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        }
-      );
-    if(response.statusCode == 200) {
-      return true; // Placeholder return value
-    } else {
-      return false;
-    }
+    var tok = await storage.read(key: 'jwt');
+    if(tok != null)   return true;
+    return false;
   }
 
   @override
@@ -67,9 +60,19 @@ class CustomDrawerState extends State<CustomDrawer> {
                   return ListTile(
                     leading: const Icon(Icons.exit_to_app),
                     title: const Text('Logout'),
-                    onTap: () {
+                    onTap: () async {
                       // Implement logout logic
-                      Navigator.pop(context);
+                      var tok = await storage.read(key: "jwt");
+                      var res = await http.get(Uri.parse("http://10.0.2.2:5000/api/logout"), headers : {
+                        'Authorization' : 'Bearer $tok',
+                      });
+                      print(res.statusCode);
+                      if(res.statusCode == 200){
+
+                        await storage.delete(key: "jwt");
+
+                        Navigator.of(context).pushReplacementNamed('/login');
+                      }
                     },
                   );
                 } else {

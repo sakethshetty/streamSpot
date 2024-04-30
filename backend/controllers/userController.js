@@ -3,6 +3,7 @@
 const bcrypt = require('bcrypt');
 const prisma = require('../prisma/index');
 const cookieToken = require('../utils/cookieToken');
+// const saltRounds = 10;
 
 exports.signup = async (req, res, next) => {
     try {
@@ -10,12 +11,12 @@ exports.signup = async (req, res, next) => {
         if (!name || !email || !password) {
             throw new Error('Please Provide all details');
         }
-
+        // const hashedPassword = bcrypt.hashSync(password, saltRounds);
         const user = await prisma.user.create({
             data: {
                 name,
                 email,
-                password,
+                "password" : hashedPassword,
             }
         });
 
@@ -35,8 +36,9 @@ exports.signup = async (req, res, next) => {
 exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
+        console.log(email, password);
         if (!email || !password) {
-            throw new Error("Please enter both credentials");
+            return res.status(401).send("Please enter both credentials");
         }
 
         const user = await prisma.user.findUnique({
@@ -47,12 +49,12 @@ exports.login = async (req, res, next) => {
 
         // If no user found
         if (!user) {
-            throw new Error("User not found");
+            return res.status(401).send("User not found");
         }
 
         // If password mismatch
-        if (user.password !== password) {
-            throw new Error("Invalid password");
+        if (user.password != password) {
+            return res.status(401).send("Invalid password");
         }
         cookieToken(user, res);
         // If login successful, send success response

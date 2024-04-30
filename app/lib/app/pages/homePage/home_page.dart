@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:app/app/widgets/bottom_nav_bar.dart';
 import 'package:app/app/pages/userDetailsPage/user_detail_page.dart';
@@ -7,7 +9,29 @@ import 'package:app/app/widgets/drawer.dart';
 
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+
+  
+  const HomePage(this.jwt, this.payload, {super.key});
+
+  final String jwt;
+  final Map<String, dynamic> payload;
+
+  factory HomePage.fromBase64(String jwt) {
+  try {
+    final payload = json.decode(
+      utf8.decode(
+        base64.decode(base64.normalize(jwt.split(".")[1])),
+      ),
+    );
+    return HomePage(jwt, payload);
+  } catch (e) {
+    // Handle the error (e.g., return a default instance or show an error message)
+    return const HomePage("default_jwt", {});
+  }
+}
+
+
+
   @override
   HomePageState createState() => HomePageState();
 }
@@ -24,8 +48,8 @@ class HomePageState extends State<HomePage> {
 
   // List of pages for navigation
   final List<Widget> _pages = [
-    const VideoListPage(), // VideoListPage is now one of the pages
-    const AccountDetailsPage()
+    const VideoListPage(),
+    const AccountDetailsPage(),// VideoListPage is now one of the pages
     // Add other pages here
   ];
 

@@ -44,8 +44,8 @@ export default function NavbarComponent() {
         <Navbar.Link href="#" >
           Home
         </Navbar.Link>
-        <Navbar.Link href="#">Trending</Navbar.Link>
-        <Navbar.Link href="#">Subscribed   </Navbar.Link>
+        <Navbar.Link href="/page2">Trending</Navbar.Link>
+        <Navbar.Link href="/page3">Subscribed   </Navbar.Link>
         </Navbar.Collapse>
     </Navbar>
   );
