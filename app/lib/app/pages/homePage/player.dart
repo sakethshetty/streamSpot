@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-/// Stateful widget to fetch and then display video content.
 class VideoApp extends StatefulWidget {
-  const VideoApp({super.key});
+  final String videoUrl;
+
+  const VideoApp({super.key, required this.videoUrl});
 
   @override
   VideoAppState createState() => VideoAppState();
@@ -15,8 +16,7 @@ class VideoAppState extends State<VideoApp> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.networkUrl(Uri.parse(
-        'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4'))
+    _controller = VideoPlayerController.networkUrl(Uri.parse("https://drive.google.com/uc?export=download&id=1sXD0Y9fiQpt0Mbf8qJiWkpiqBSXYZFWw"))
       ..initialize().then((_) {
         // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
         setState(() {});
@@ -25,31 +25,88 @@ class VideoAppState extends State<VideoApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Video Demo',
-      home: Scaffold(
-        body: Center(
-          child: _controller.value.isInitialized
-              ? AspectRatio(
-                  aspectRatio: _controller.value.aspectRatio,
-                  child: VideoPlayer(_controller),
-                )
-              : Container(),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            setState(() {
-              _controller.value.isPlaying
-                  ? _controller.pause()
-                  : _controller.play();
-            });
-          },
-          child: Icon(
-            _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+    return Scaffold(
+        appBar: AppBar(title: const Text('Video Player')),
+        body: Column(
+  crossAxisAlignment: CrossAxisAlignment.stretch,
+  children: [
+    Expanded(
+      flex: 4,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Center(
+            child: _controller.value.isInitialized
+                ? AspectRatio(
+                    aspectRatio: _controller.value.aspectRatio,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _controller.value.isPlaying
+                              ? _controller.pause()
+                              : _controller.play();
+                        });
+                      },
+                      child: VideoPlayer(_controller),
+                    ),
+                  )
+                : const CircularProgressIndicator(),
           ),
-        ),
+          if (!_controller.value.isPlaying)
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  _controller.value.isPlaying
+                      ? _controller.pause()
+                      : _controller.play();
+                });
+              },
+              icon: const Icon(
+                Icons.play_arrow,
+                size: 64.0,
+                color: Colors.white,
+              ),
+            ),
+        ],
       ),
-    );
+    ),
+    Expanded(
+      flex: 2,
+      child: SingleChildScrollView(
+        child:
+            // Comments Section (Replace with actual comments widget)
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              color: const Color.fromARGB(255, 237, 226, 226),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Comments',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8.0),
+                  // Sample Comment
+                  ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.blue,
+                      child: Icon(Icons.person, color: Colors.white),
+                    ),
+                    title: Text('User123'),
+                    subtitle: Text('Great video!'),
+                  ),
+                  // Add more comments here...
+                ],
+              ),
+            ),
+              ),
+            ),
+          ],
+        ),
+      );
   }
 
   @override

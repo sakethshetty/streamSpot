@@ -1,4 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 class AccountDetailsPage extends StatefulWidget {
   const AccountDetailsPage({super.key});
@@ -18,7 +23,8 @@ class AccountDetailsPageState extends State<AccountDetailsPage> {
 
   Future<UserAccount> fetchUserAccount() async {
     // Your existing fetchUserAccount logic
-    return UserAccount(username: 'username', email: 'email', videos: ['video1', 'video2']);
+    return UserAccount(
+        username: 'username', email: 'email', videos: ['video1', 'video2']);
   }
 
   @override
@@ -46,6 +52,30 @@ class AccountDetails extends StatelessWidget {
 
   const AccountDetails({super.key, required this.userAccount});
 
+  Future<void> uploadVideo(File videoFile, File thumbnailFile) async {
+  var url = Uri.parse('http://10.0.2.2:5000/api/video/uploadVideo'); // Replace with your server URL
+  var request = http.MultipartRequest('POST', url);
+
+  // Add video and thumbnail as multipart files
+  request.files.add(await http.MultipartFile.fromPath('video', videoFile.path, contentType: MediaType('video', 'mp4')));
+  request.files.add(await http.MultipartFile.fromPath('thumbnail', thumbnailFile.path, contentType: MediaType('image', 'jpeg')));
+
+  // Add title and description fields (optional, modify as needed based on your API)
+  request.fields['title'] = 'My Video Title';
+  request.fields['description'] = 'My Video Description';
+
+  var response = await request.send();
+
+  if (response.statusCode == 200) {
+    print('Video uploaded successfully!');
+    // Handle successful upload response (e.g., navigate to success screen)
+  } else {
+    print('Error uploading video: ${response.reasonPhrase}');
+    // Handle upload errors (e.g., display error message to user)
+  }
+}
+
+
   @override
   Widget build(BuildContext context) {
     // Your existing AccountDetails build method
@@ -71,6 +101,18 @@ class AccountDetails extends StatelessWidget {
             },
           ),
         ),
+        ElevatedButton(
+          onPressed: () async {
+            FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+            if (result != null) {
+              // Handle the selected file here
+              File file = File(result.files.single.path!);
+              uploadFile(file);
+            }
+          },
+          child: const Text('Select File'),
+        )
       ],
     );
   }
@@ -82,6 +124,7 @@ class UserAccount {
   final String email;
   final List<String> videos;
 
-  UserAccount({required this.username, required this.email, required this.videos});
+  UserAccount(
+      {required this.username, required this.email, required this.videos});
   // Add any other necessary fields and methods
 }

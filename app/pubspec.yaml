@@ -38,6 +38,8 @@ dependencies:
   cupertino_icons: ^1.0.6
   flutter_secure_storage: ^9.0.0
   video_player: ^2.8.6
+  file_picker: ^8.0.3
+  http_parser: ^4.0.2
 
 dev_dependencies:
   flutter_test:
