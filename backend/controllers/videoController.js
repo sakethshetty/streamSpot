@@ -26,79 +26,61 @@ const drive = google.drive({
 });
 
 // Function to upload file to Google Drive
-exports.uploadVideo = async (req, res, next) => {
-    const { videoFilePath, thumbnailFilePath, title, description,} = req.body;
-    //now here neglectd the channelId ... later we have to take as input parameter
+async function uploadFileToDrive(fileStream, fileName, mimeType) {
     try {
-        // Check if files exist
-        if (!fs.existsSync(videoFilePath) || !fs.existsSync(thumbnailFilePath)) {
-            return res.status(404).json({ error: 'One or more files not found at the specified file paths' });
-        }
-
-        // Create read streams for video and thumbnail files
-        const videoFileStream = fs.createReadStream(videoFilePath);
-        const thumbnailFileStream = fs.createReadStream(thumbnailFilePath);
-
-        // it is for uploading video file to Google Drive
-        const videoResponse = await drive.files.create({
+        const response = await drive.files.create({
             requestBody: {
-                name: path.basename(videoFilePath),
-                mimeType: 'video/mp4',
+                name: fileName,
+                mimeType: mimeType,
             },
             media: {
-                mimeType: 'video/mp4',
-                body: videoFileStream,
+                mimeType: mimeType,
+                body: fileStream,
             },
         });
-        console.log("video uploaded to Google Drive");
-        //it is for Uploading thumbnail image to Google Drive
-        const thumbnailResponse = await drive.files.create({
-            requestBody: {
-                name: path.basename(thumbnailFilePath),
-                mimeType: 'image/jpeg', // Adjust MIME type if needed
-            },
-            media: {
-                mimeType: 'image/jpeg',
-                body: thumbnailFileStream,
-            },
-        });
-        
-        console.log("photo uploaded to Google Drive");
-        
+        return response.data.id;
+    } catch (error) {
+        console.error('Error uploading file to Google Drive:', error);
+        throw new Error('Failed to upload file to Google Drive');
+    }
+}
 
-        // Generate sharable links for the uploaded video and thumbnail
-        const videoFileId = videoResponse.data.id;
-        const thumbnailFileId = thumbnailResponse.data.id;
+// Function to upload video to Google Drive
+exports.uploadVideo = async (req, res, next) => {
+    try {
+        const { title, description } = req.body;
+        const videoFileStream = req.files.video[0].stream;
+        const thumbnailFileStream = req.files.thumbnail[0].stream;
+        const videoName = req.files.video[0].originalname;
+        const thumbnailName = req.files.thumbnail[0].originalname;
+
+        const videoFileId = await uploadFileToDrive(videoFileStream, videoName, 'video/mp4');
+        const thumbnailFileId = await uploadFileToDrive(thumbnailFileStream, thumbnailName, 'image/jpeg');
+
+        // generating sharable link for the uploaded video and thumbnail
         const videoPublicUrl = await generatePublicUrl(videoFileId);
-        const thumbnailPublicUrl = await generatePublicUrl(thumbnailFileId);    
+        const thumbnailPublicUrl = await generatePublicUrl(thumbnailFileId);
 
-        console.log("video Sharable link generated:", videoPublicUrl);
-        console.log("tumbnail Sharable link generated:", thumbnailPublicUrl);
         
-        // Store video details in MongoDB
         const video = await prisma.video.create({
             data: {
                 title,
                 description,
                 url: videoPublicUrl.webViewLink,
                 thumbnail: thumbnailPublicUrl.webViewLink,
-                //channelId,
             }
         });
 
-        // Send response with created video data
-        res.json(video);
+        res.json({ videoUrl: videoPublicUrl.webViewLink, thumbnailUrl: thumbnailPublicUrl.webViewLink });
     } catch (error) {
-        // Handle errors
         console.error("Error during video upload:", error);
         next(error);
     }
 };
 
-// Function to generate sharable link for the uploaded video
+// Function to generate sharable link for the uploaded file
 async function generatePublicUrl(fileId) {
     try {
-        // Set permissions for the file
         await drive.permissions.create({
             fileId: fileId,
             requestBody: {
@@ -107,32 +89,26 @@ async function generatePublicUrl(fileId) {
             },
         });
 
-        // Get sharable link for the file
         const result = await drive.files.get({
             fileId: fileId,
             fields: 'webViewLink, webContentLink',
         });
 
-        // Return the link data
         return result.data;
     } catch (error) {
-        // Handle errors
         console.error(error.message);
         throw new Error("Failed to generate sharable link");
     }
 }
 
 
-
-
 //it is a function to delete a video
 exports.deleteVideo = async (req, res, next) => {
-    //console.log("DDD***");
 
     const { id } = req.params;
     try {
         const result = await prisma.video.delete({
-            where: { id: id }  // Pass the raw ID if it's an ObjectId
+            where: { id: id }  
         });
         res.json(result);
     } catch (error) {

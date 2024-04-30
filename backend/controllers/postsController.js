@@ -1,6 +1,5 @@
 const prisma = require('../prisma/index');
 const { google } = require('googleapis');
-const path = require('path');
 const fs = require('fs');
 
 const CLIENT_ID = '796518376376-e24tlbe3i51pgviolmk7o7btaef9esh7.apps.googleusercontent.com';
@@ -21,7 +20,7 @@ const drive = google.drive({
     auth: oauth2Client,
 });
 
-// it is function to generate sharable link where by using this link,we stored this sharable link into the MONGO DB databse 
+// Function to generate sharable link
 async function generatePublicUrl(fileId) {
     try {
         await drive.permissions.create({
@@ -42,19 +41,38 @@ async function generatePublicUrl(fileId) {
     }
 }
 
-//it is function to Create and upload Post to Google Drive by using the Gdrive API to store the Posts
+// it is a function to upload file stream to Google Drive
+async function uploadFileToDrive(fileStream, fileName) {
+    try {
+        const response = await drive.files.create({
+            requestBody: {
+                name: fileName,
+                mimeType: 'image/jpeg', 
+            },
+            media: {
+                mimeType: 'image/jpeg', 
+                body: fileStream,
+            },
+        });
+        return response.data.id;
+    } catch (error) {
+        console.error('Error uploading file to Google Drive:', error);
+        throw new Error('Failed to upload file to Google Drive');
+    }
+}
+
+// it is for Create and upload Post to Google Drive
 exports.createPost = async (req, res, next) => {
     try {
-        const { title, content, authorId, filePath } = req.body;
+        const { title, content, authorId, fileStream, fileName } = req.body;
 
         // Upload file to Google Drive
-        const fileData = await uploadFile(filePath);
-        const { id: fileId } = fileData;
+        const fileId = await uploadFileToDrive(fileStream, fileName);
 
-        // here we called the function to generate the URL
+        // Generate sharable link for the uploaded file
         const fileLink = await generatePublicUrl(fileId);
 
-        //creating the posts
+        // Create post with file link
         const result = await prisma.post.create({
             data: {
                 title,
